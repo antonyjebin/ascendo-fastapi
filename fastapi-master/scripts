@@ -1,0 +1,37 @@
+#starting minikube
+minikube start
+
+#set docker local environment in minikube
+minikube docker-env
+@FOR /f "tokens=*" %i IN ('minikube -p minikube docker-env') DO @%i
+
+#dockerhub login
+docker login
+
+#create image
+docker build -t fastapi-ascendo .
+
+#tag and push my dockerhubID
+docker tag fastapi-ascendo antonyjebinraj/fastapi-ascendo
+docker push antonyjebinraj/fastapi-ascendo
+
+#pull image
+docker pull sonarqube:latest
+
+#deployment
+kubectl apply -f fastapi-deploy.yaml
+kubectl apply -f sonarqube-deploy.yaml
+
+#Get Pod Name
+kubectl get pods
+
+#expose port into localhost(ClusterIp)
+kubectl port-forward --address 192.168.68.109 pod/fastapi-deployment-74c94f8699-r8pbj 8001:8000
+kubectl port-forward --address 192.168.68.109 pod/sonarqube-74c94f8699-r8pbj 9000:9000
+
+---SonarScanner installed on your local machine---
+#edit the file (sonar-project.properties)
+cd D:\Jebin\Apps\sonar-scanner-4.8.0.2856-windows\jre\conf
+
+#run sonar-scanner
+sonar-scanner
